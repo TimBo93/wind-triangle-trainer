@@ -1,0 +1,43 @@
+:root {
+  --bg: #0b1120;
+  --bg-panel: #111a2e;
+  --bg-panel-2: #0f172a;
+  --border: #1e293b;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --accent: #38bdf8;
+
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+body {
+  background: radial-gradient(1200px 600px at 70% -10%, #14213d 0%, var(--bg) 55%);
+  color: var(--text);
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+a {
+  color: var(--accent);
+}
+
+input[type='number'] {
+  font-family: inherit;
+}
