@@ -75,6 +75,7 @@
 }
 
 .col-left,
+.col-center,
 .col-right {
   display: flex;
   flex-direction: column;

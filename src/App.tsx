@@ -84,16 +84,18 @@ export default function App() {
           </div>
         </div>
 
-        <div className="col-center panel viz">
-          <WindTriangle input={input} result={result} onWindDirChange={handleWindDir} />
-        </div>
-
-        <div className="col-right">
-          <Results input={input} result={result} />
+        <div className="col-center">
+          <div className="panel viz">
+            <WindTriangle input={input} result={result} onWindDirChange={handleWindDir} />
+          </div>
           <div className="panel viz-small">
             <h2>Gegen- &amp; Seitenwind</h2>
             <CrosswindDiagram result={result} />
           </div>
+        </div>
+
+        <div className="col-right">
+          <Results input={input} result={result} />
         </div>
       </main>
 

@@ -26,7 +26,8 @@ const COLORS = {
   ring: '#334155',
   ringText: '#94a3b8',
   guide: '#475569',
-  arc: '#f59e0b',
+  drift: '#f472b6',
+  angle: '#fbbf24',
   point: '#e2e8f0',
 }
 
@@ -48,7 +49,7 @@ export default function WindTriangle({ input, result, onWindDirChange }: Props) 
     const heading = result.solvable ? result.heading : course
 
     const maxMag = Math.max(tas, windSpeed, Number.isFinite(gs) ? gs : 0, 1)
-    const s = (R * 0.7) / maxMag
+    const s = (R * 0.8) / maxMag
 
     const root = svg.append('g')
 
@@ -173,11 +174,11 @@ export default function WindTriangle({ input, result, onWindDirChange }: Props) 
         .append('path')
         .attr('d', `M${a1.x},${a1.y} A${rr},${rr} 0 0 ${sweep} ${a2.x},${a2.y}`)
         .attr('fill', 'none')
-        .attr('stroke', COLORS.arc)
+        .attr('stroke', COLORS.drift)
         .attr('stroke-width', 2)
       const bis = normalize(add(groundDir, airDir))
       const lp = add(O, scale(bis, rr + 18))
-      label(lp, `${result.wca >= 0 ? '+' : ''}${result.wca.toFixed(1)}°`, COLORS.arc, 13, 700)
+      label(lp, `Drift ${result.wca >= 0 ? '+' : ''}${result.wca.toFixed(1)}°`, COLORS.drift, 13, 700)
     }
 
     // --- Vektor-Beschriftungen --------------------------------------------
@@ -186,8 +187,8 @@ export default function WindTriangle({ input, result, onWindDirChange }: Props) 
       const n = perp(normalize(sub(b, a)))
       return add(pt, scale(n, d))
     }
-    label(along(O, P, 0.55, -32), 'rwSK · TAS', COLORS.air, 13, 700)
-    label(along(O, Q, 0.84, 32), 'rwK · GS', COLORS.ground, 13, 700)
+    label(along(O, P, 0.5, -30), 'rwSK · TAS', COLORS.air, 13, 700)
+    label(along(O, Q, 0.5, result.wca >= 0 ? -30 : 30), 'rwK · GS', COLORS.ground, 13, 700)
     if (windSpeed > 4) {
       const midPQ = scale(add(P, Q), 0.5)
       const inward = normalize(sub(O, midPQ))
@@ -207,6 +208,33 @@ export default function WindTriangle({ input, result, onWindDirChange }: Props) 
     dot(P, COLORS.air)
     label(add(O, { x: -14, y: 16 }), 'A', COLORS.point, 15, 700)
     label(add(Q, scale(perp(groundDir), 16)), 'B', COLORS.point, 15, 700)
+
+    // --- Winkel zwischen Wind und rwK·GS (am Punkt B) --------------------
+    if (windSpeed > 0) {
+      const dQO = normalize(sub(O, Q)) // entlang Grundvektor (Richtung A)
+      const dQP = normalize(sub(P, Q)) // entlang Windvektor (Richtung P)
+      const rr = 24
+      const a1 = Math.atan2(dQO.y, dQO.x)
+      const a2 = Math.atan2(dQP.y, dQP.x)
+      let delta = a2 - a1
+      while (delta > Math.PI) delta -= 2 * Math.PI
+      while (delta < -Math.PI) delta += 2 * Math.PI
+      let d = ''
+      const steps = 28
+      for (let i = 0; i <= steps; i++) {
+        const a = a1 + (delta * i) / steps
+        d += `${i === 0 ? 'M' : 'L'}${(Q.x + rr * Math.cos(a)).toFixed(2)},${(Q.y + rr * Math.sin(a)).toFixed(2)}`
+      }
+      root.append('path').attr('d', d).attr('fill', 'none').attr('stroke', COLORS.angle).attr('stroke-width', 1.5)
+      const midA = a1 + delta / 2
+      label(
+        add(Q, { x: (rr + 15) * Math.cos(midA), y: (rr + 15) * Math.sin(midA) }),
+        `${Math.abs((delta * 180) / Math.PI).toFixed(0)}°`,
+        COLORS.angle,
+        12,
+        700,
+      )
+    }
 
     // --- Wind-Griff am Kompass (Drag = Windrichtung) ----------------------
     const hdir = bearingToScreen(windDir)
